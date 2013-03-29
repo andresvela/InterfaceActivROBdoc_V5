@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j='http://jakarta.apache.org/log4j/'>
+
+	<appender name="consoleAppender" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} - WSBdoc - %p - %c{1} %m%n"/>
+		</layout>
+	</appender>
+
+	<appender name="rollfile" class="org.apache.log4j.RollingFileAppender">
+	    <param name="Threshold" value="DEBUG"/>
+		<param name="Append" value="true"/>
+		<param name="file" value="C:/temp/WSBdoc.log"/>
+		<param name="MaxFileSize" value="1000KB"/>
+		<param name="MaxBackupIndex" value="2"/>
+		<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%d{ISO8601} - WSBdoc - %p - %c{1} %m%n"/>
+		</layout>
+	</appender>
+	
+	<!-- SMTPAppender -->
+    <appender name="EMAIL"  class="org.apache.log4j.net.SMTPAppender">
+		<param name="Threshold" value="ERROR"/>
+        <param name="BufferSize" value="1024" />
+        <param name="SMTPHost" value="" />
+        <param name="From" value="" />
+        <param name="To" value=""/>
+        <param name="Subject" value="[WSBdoc] Application Error message" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="[%d{ISO8601}]%n%n%-5p%n%n%c%n%n%m%n%n" />
+            <!--<param name="ConversionPattern" value="%d{ISO8601} - ISSU - %p - %c{1} %m%n"/>-->
+        </layout>
+    </appender>
+
+
+	<logger name="org.apache.commons" additivity="true">
+		<level value="warn"/>
+	</logger>
+
+	<logger name="httpclient" additivity="true">
+		<level value="warn"/>
+	</logger>
+
+	<logger name="org.apache" additivity="true">
+		<level value="warn"/>
+	</logger>
+
+	<logger name="org.springframework" additivity="true">
+		<level value="warn"/>
+	</logger>
+
+	<logger name="com.bdoc" additivity="true">
+		<level value="debug"/>
+	</logger>
+
+	<root>
+	   <priority value="debug"/>
+	   <appender-ref ref="consoleAppender"/>
+	</root>
+
+</log4j:configuration>

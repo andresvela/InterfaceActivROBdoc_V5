@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://interfaces.webservice.interfaces.bdoc.com" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://interfaces.webservice.interfaces.bdoc.com" xmlns:intf="http://interfaces.webservice.interfaces.bdoc.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://interfaces.webservice.interfaces.bdoc.com" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="xmlFlow">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:byte"/>
+     </sequence>
+    </complexType>
+   </element>
+   <complexType name="WebServiceRetour">
+    <sequence>
+     <element name="byteBuffer" nillable="true" type="xsd:base64Binary"/>
+     <element name="errorCode" type="xsd:int"/>
+     <element name="errorMessage" nillable="true" type="xsd:string"/>
+     <element name="returnType" type="xsd:int"/>
+     <element name="stringBuffer" nillable="true" type="xsd:string"/>
+    </sequence>
+   </complexType>
+   <element name="generateReturn" type="impl:WebServiceRetour"/>
+   <element name="numeroEdition" type="xsd:string"/>
+   <element name="getDocumentReturn" type="impl:WebServiceRetour"/>
+   <element name="bdocWebProfileName" type="xsd:string"/>
+   <element name="getRessourcesListReturn" type="impl:WebServiceRetour"/>
+   <element name="xmlFlow1">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:byte"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="generateBatchReturn" type="impl:WebServiceRetour"/>
+   <element name="indexList">
+    <complexType>
+     <sequence>
+      <element maxOccurs="unbounded" minOccurs="0" name="item" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="getDocumentMultiIndexReturn" type="impl:WebServiceRetour"/>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="getDocumentMultiIndexResponse">
+
+      <wsdl:part element="impl:getDocumentMultiIndexReturn" name="getDocumentMultiIndexReturn">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRessourcesListRequest">
+
+      <wsdl:part element="impl:bdocWebProfileName" name="bdocWebProfileName">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="generateBatchResponse">
+
+      <wsdl:part element="impl:generateBatchReturn" name="generateBatchReturn">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="generateRequest">
+
+      <wsdl:part element="impl:xmlFlow" name="xmlFlow">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDocumentMultiIndexRequest">
+
+      <wsdl:part element="impl:indexList" name="indexList">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="getRessourcesListResponse">
+
+      <wsdl:part element="impl:getRessourcesListReturn" name="getRessourcesListReturn">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="generateResponse">
+
+      <wsdl:part element="impl:generateReturn" name="generateReturn">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="generateBatchRequest">
+
+      <wsdl:part element="impl:xmlFlow1" name="xmlFlow">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDocumentResponse">
+
+      <wsdl:part element="impl:getDocumentReturn" name="getDocumentReturn">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="getDocumentRequest">
+
+      <wsdl:part element="impl:numeroEdition" name="numeroEdition">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:portType name="DocumentGenerationImpl">
+
+      <wsdl:operation name="generate" parameterOrder="xmlFlow">
+
+         <wsdl:input message="impl:generateRequest" name="generateRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:generateResponse" name="generateResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDocument" parameterOrder="numeroEdition">
+
+         <wsdl:input message="impl:getDocumentRequest" name="getDocumentRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:getDocumentResponse" name="getDocumentResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRessourcesList" parameterOrder="bdocWebProfileName">
+
+         <wsdl:input message="impl:getRessourcesListRequest" name="getRessourcesListRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:getRessourcesListResponse" name="getRessourcesListResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="generateBatch" parameterOrder="xmlFlow">
+
+         <wsdl:input message="impl:generateBatchRequest" name="generateBatchRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:generateBatchResponse" name="generateBatchResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDocumentMultiIndex" parameterOrder="indexList">
+
+         <wsdl:input message="impl:getDocumentMultiIndexRequest" name="getDocumentMultiIndexRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:getDocumentMultiIndexResponse" name="getDocumentMultiIndexResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="DocumentGenerationImplSoapBinding" type="impl:DocumentGenerationImpl">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="generate">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="generateRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="generateResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDocument">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDocumentRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDocumentResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getRessourcesList">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getRessourcesListRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getRessourcesListResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="generateBatch">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="generateBatchRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="generateBatchResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="getDocumentMultiIndex">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="getDocumentMultiIndexRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="getDocumentMultiIndexResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="DocumentGenerationImplService">
+
+      <wsdl:port binding="impl:DocumentGenerationImplSoapBinding" name="DocumentGenerationImpl">
+
+         <wsdlsoap:address location="http://localhost:8080/InterfaceActivROBdoc/services/DocumentGenerationImpl"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

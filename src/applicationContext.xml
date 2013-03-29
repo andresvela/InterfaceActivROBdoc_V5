@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	
+	<!-- Paramétrage des indexes à parser -->
+	<bean id="xmlIndexes" class="com.bdoc.interfaces.webservice.parametres.XMLIndexes" init-method="initialize">
+		<property name="indexesDefinition">
+	 		<map>
+				
+				<!-- selection du media utilise -->
+				<entry key="CHANNEL" value="//DOCUMENT/TECHDATA/channel"/>	
+				
+								
+				<!--
+				<entry key="IMMEDIAT" value="//DOCUMENT/TECHDATA/immediat"/>		
+				<entry key="DIFFERE" value="document/optionsEdition/differe"/>		
+				<entry key="PREVISUALISATION" value="document/optionsEdition/previsualisation"/>
+				 <entry key="MODIFICATION" value="document/optionsEdition/modificationDocument"/> 		
+				<entry key="DIFFUSION" value="document/optionsEdition/modeDiffusion"/>		
+				<entry key="CANAL_DIFFUSION" value="document/optionsEdition/optionsImmediat/choixCanal"/>		
+				-->
+				
+				<!--parametres des actions -->
+				<entry key="NUMEDITION" value="//DOCUMENT/TECHDATA/numEdition"/>								
+					<!-- droits sur les PDF 	
+				<entry key="CANANOTATE" value="document/optionsEdition/optionsPdf/optionAnnotate"/> 				
+				<entry key="CANMODIFY" value="document/optionsEdition/optionsPdf/optionModify"/>				
+				<entry key="CANPRINT" value="document/optionsEdition/optionsPdf/optionPrint"/>				
+				<entry key="CANSAVE" value="document/optionsEdition/optionsPdf/optionSave"/>
+				<entry key="PRINT" value="document/optionsEdition/optionsPdf/optionPrint"/>
+				-->	
+					<!-- Imprimante dynamique pour BdocEdit : Est-ce bien utile ??? 
+				<entry key="DYNAMIC_PRINTER" value="document/optionsEdition/optionsPdf/choixImprimante"/>		
+				-->
+					<!-- Options pour la dépose de fichier en GED une fois implémentés 
+				<entry key="GED" value="document/stockageGed"/>		-->
+					<!-- Nom du modele de document. -->
+				<entry key="TEMPLATE" value="//DOCUMENT/TECHDATA/nomModele"/>
+					<!-- Domaine  modele de document. -->
+				<entry key="DOMAINE" value="//DOCUMENT/TECHDATA/domaineModele"/>
+				<!-- Flux  modele de document. -->
+				 <entry key="FLUX" value="//DOCUMENT/TECHDATA/fluxModele"/>
+				 
+				 <!-- repOut modele de document. -->
+				 <entry key="REPOUT" value="//DOCUMENT/TECHDATA/repOutModele"/>
+				 
+				<!--	Je ne suis pas certain que ca marche !!!	 	
+				<entry key="NBEXEMPLAIRE" value="document/optionsEdition/nombreCopies"/>
+				 -->
+			</map>		
+		</property>
+		
+		<!-- Constantes à utiliser dans la suite du document ... ca evite juste de se les retaper a chaque modification! -->
+		<property name="constantIndexes">
+			<map>
+				<entry key="NULL" value=""/>
+				  <entry key="BDOCEDIT_REPIN" value="\\port7-vela\c$\BdocEdit\MGR\Rep_In\"/>	
+								
+								
+				<entry key="CLIENT_VALUE" value="ADREA"/>	
+				<entry key="TRUE_VALUE" value="TRUE"/>
+				<entry key="NBEXEMPLAIRE" value="1"/>		
+				<entry key="PREVISUALISATION" value="true"/>	
+							
+			</map>
+		</property>
+		
+		 
+		<!-- Indexes pre-calculés : idem ca évite de se les retapper. -->
+		<property name="computedIndexes">
+			<map>
+				<!-- On utilise BdocEdit si on es en Differe mais pas en immediat ou un canal "EDIT"
+				<entry key="TO_BDOCEDIT" value="{{{DIFFERE='true'} AND {IMMEDIAT='false'}} OR {CANAL_DIFFUSION='EDIT'}}"/>
+				-->
+				<entry key="TO_BDOCEDIT" value="{{CHANNEL='Batch'}  OR {CHANNEL='Email'}}"/>
+			
+				<!-- Pas util chez si on utilise pas BdocInteractive 
+				<entry key="TO_BDOCINT" value="{MODIFICATION='true'}"/>
+				-->				
+				<!-- en faite on va faire not BdocEdit .... c'est peut-être plus simple -->
+				<entry key="TO_BDOCWEB" value="{CHANNEL='onDemand'}"/>
+				
+				<!-- on conserve le document dans une zone de stockage ... si on utilise BdocWeb. Dans le cas de BdocEdit c'est réalisé dans BdocEdit. 
+				<entry key="TO_STOCKAGE" value="{{IMMEDIAT!='true'} AND {DIFFERE!='true'} AND {GED='true'}}"/>
+				-->
+				<!--
+				<entry key="DATE" value="{NUMEDITION$'8'}"/>	
+				-->
+			</map>
+		</property>
+	</bean> 
+
+	
+	<!-- Liste des actions possibles -->
+	<bean id="ActionList"  class="com.bdoc.interfaces.webservice.parametres.ActionList"  init-method="initialize">
+		<property name="actionList">
+			<list>
+			
+				<!-- Envoi d'un document vers BdocEdit -->
+				<bean id="toBdocEdit" class="com.bdoc.interfaces.webservice.actions.implementations.ToBdocEditCFC" init-method="initialize">
+					<property name="name" value="BdocEdit"/>
+					<property name="filter" value="{TO_BDOCEDIT='TRUE'}"/>
+					<property name="bdocEditInputdirectory" value="C:/TEMP"/>
+					<property name="outputFilename" value="{FLUX}"></property>
+					<property name="repInName" value="{BDOCEDIT_REPIN}"></property>
+					<property name="templateName" value="{TEMPLATE}"/> 
+					<property name="channelName" value="{CHANNEL}"/> 
+				</bean>
+		
+			
+				<!-- Action permettant de composer un document via bdocWeb-->
+				<bean id="toBdocWeb" class="com.bdoc.interfaces.webservice.actions.implementations.ToBdocWebCFC" init-method="initialize">
+					<property name="name" value="BdocWeb"/>
+					<!--	
+					<property name="filter" value="{{TO_BDOCWEB} OR {TO_STOCKAGE}}"/>					
+					-->
+					
+					<property name="filter" value="{TO_BDOCWEB}"/>
+					
+					<property name="domainName" value="{DOMAINE}"/>
+					<property name="templateName" value="{TEMPLATE}"/> 
+					<property name="flowName" value="{FLUX}"/>
+					<property name="repOutName" value="{REPOUT}"/>
+				
+					<property name="bdocWebProfileName" value="BdocWebVELA_5.0"/>
+
+					<!-- a mettre à jour si-besoin en fonction des indexes récupéré plus haut -->
+					<property name="canModify" value="{TRUE_VALUE}"/>
+					<property name="canPrint" value="{TRUE_VALUE}"/>
+					<property name="canCopy" value="{TRUE_VALUE}"/>
+					<property name="canAnotate" value="{TRUE_VALUE}"/>
+  
+  					<!-- Appel de la fonction archive -->
+					<property name="doGEDIndex" value="FALSE"/>
+					
+					<!-- copie du fichier de données dans un répertoire -->
+					<!-- <property name="saveFile" value="{DIFFERE='true'}"/>  -->
+					<property name="saveFile" value="TRUE"/> 
+					<property name="savePath" value="{REPOUT}"/>
+				
+					<property name="exemplaireIndex" value="{NBEXEMPLAIRE}"/>
+		
+					<!-- ajout du javascript qui va bien dans le PDF si besoin pour impression avec tout le confort moderne
+					<property name="doPrintIndex" value="{{PRINT='true'} AND {IMMEDIAT='true'}}"/>
+					<property name="doManualPrintIndex" value="{{DYNAMIC_PRINTER='true'} AND {IMMEDIAT='true'}}"/>
+					<property name="doCloseDocumentIndex" value="{PREVISUALISATION='false'}"/>
+					--> 
+
+					<!-- renvoyer le PDF au client--> 
+				    <property name="doPrevisuIndex" value="{PREVISUALISATION='true'}"/>
+
+
+					<!-- Recherche des modèles par mot clé key1=value1 ET key2=value2 ET ...  -->
+					<!-- les values peuvent être des indexes -->					
+					<!--  
+					<property name="templateFindCriteriaIndex">
+						<map>
+							<entry key="key1" value="value1"/> 
+							<entry key="key2" value="value2"/>
+						</map>
+					</property>
+					-->
+				</bean>
+				
+								<!-- Action permettant de retrouver l'URL d'appel à BdocInteractive + Contexte + Dossier -->				
+				<bean id="toBdocInteractive" class="com.bdoc.interfaces.webservice.actions.implementations.ToBdocInteractive" init-method="initialize">
+					<property name="filter" value="{TEMPLATE!=''}"/>
+					<property name="spool" value="c:/temp"/>
+					<property name="url" value="http://localhost:8080/bdocI"/>
+					<property name="user" value="achrist"/>
+					<property name="password" value="achrist"/>
+					<property name="bcId" value="{NUMEDITION}"/>
+					<property name="bcType" value="DIRECT"/>
+					<property name="title" value="Mon dossier {NUMEDITION}"/>
+					<property name="templates">
+						<list>
+							<value>{TEMPLATE}</value>
+						</list>
+					</property>
+					<property name="bdocWebProfileName" value="BdocWeb"/>
+					<!-- execution de la mise en GED - fichier d'index déposé en premier -->
+					<property name="ged" value="TRUE"/>
+					<property name="gedDomaineName" value="ASS"/>
+					<property name="gedTemplateName" value="TNZD2044"/>
+					<property name="metaInfoMap">
+						<map>
+							<entry key="authorId" value="achrist"/>
+						</map>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Fonction de mise en GED -->
+	<bean id="gedConnector" class="com.bdoc.interfaces.webservice.ged.GedConnector" init-method="initialize" >
+		<property name="gedConnection" ref="gedConnection"/>
+		<!-- <property name="gedConnection" ref="gedConnection2"/> -->
+		<property name="gedConnections">
+		<list>
+			<ref bean="gedConnection1"/>
+			<ref bean="gedConnection2"/>
+		</list>
+		</property>
+	</bean>
+
+	<bean id="gedConnection" class="com.bdoc.interfaces.webservice.ged.GedFileSystem">
+		<!-- répertoire de base pour la mise en GED -->
+		<property name="rootGedSpool" value="C:/TEMP/GED/CLIENT/{NUMEDITION$'8'}"/>
+		<!-- Nom du fichier dans le répertoire de GED -->
+		<property name="fileNameIndex" value="{numeroEdition}"/>
+		<!-- répertoire pour les documents -->
+		<property name="Doc_Relative_Path" value="/DOCUMENT"/>		
+		<!-- répertoire pour les indexes -->
+		<property name="Idx_Relative_Path" value="/INDEX"/>		
+		<!-- extention pour l'indexe -->
+		<property name="Idx_Extention" value=".xml"/>		
+		<!-- fait-on la GED ?-->
+		<property name="saveIndexIfExists" value="TRUE"/>		
+
+	</bean>
+
+<!-- Seconde version du connecteur de ged permettant de soumettre un calcul du chemin des fichiers de GED -->
+	<bean id="gedConnection2" class="com.bdoc.interfaces.webservice.ged.GedFileSystemMultiParam">
+
+		<property name="name" value="GED 2"/>
+		<property name="filter" value="{CLIENT_GED!=TITI}"></property>
+		<!--  depose des fichiers -->
+		<!-- repertoire de dépose des document à mettre en GED -->
+		<property name="storeDocPath" value="C:/TEMP/GED/CLIENT/{NUMEDITION$'8'}/{NUMEDITION}.PDF"/>
+		<!-- répertoire de dépose des index de GED -->
+		<property name="storeIdxPath" value="C:/TEMP/GED/CLIENT/{NUMEDITION$'8'}/{NUMEDITION}.IDX"/>
+
+		<!-- repertoire de dépose des document à mettre en GED -->
+		<property name="createPath" value="FALSE"/>
+		<!-- répertoire de dépose des index de GED -->
+		<property name="saveIndexIfExists" value="FALSE"/>
+
+		<!--  recuperation des fichiers -->
+		<!-- repertoire de dépose des document à mettre en GED -->
+		<property name="getDocPath" value="C:/TEMP/GED/{CLIENT_GED}/{IDX1$'8'}/{IDX1}.PDF"/>
+		<!-- répertoire de dépose des index de GED -->
+		<!-- <property name="getIdxPath" value="C:/TEMP/GED/{CLIENT_GED}/{IDX1}.IDX"/> -->
+
+	</bean>
+
+<!-- Seconde version du connecteur de ged permettant de soumettre un calcul du chemin des fichiers de GED -->
+	<bean id="gedConnection1" class="com.bdoc.interfaces.webservice.ged.GedFileSystemMultiParam">
+
+		<property name="name" value="GED 1"/>
+		<property name="filter" value="{CLIENT_GED=TITI}"></property>
+		<!--  depose des fichiers -->
+		<!-- repertoire de dépose des document à mettre en GED -->
+		<property name="storeDocPath" value="C:/TEMP/GED/CLIENT/{NUMEDITION$'8'}/{NUMEDITION}.PDF"/>
+		<!-- répertoire de dépose des index de GED -->
+		<property name="storeIdxPath" value="C:/TEMP/GED/CLIENT/{NUMEDITION$'8'}/{NUMEDITION}.IDX"/>
+
+		<!-- repertoire de dépose des document à mettre en GED -->
+		<property name="createPath" value="FALSE"/>
+		<!-- répertoire de dépose des index de GED -->
+		<property name="saveIndexIfExists" value="FALSE"/>
+
+		<!--  recuperation des fichiers -->
+		<!-- repertoire de dépose des document à mettre en GED -->
+		<property name="getDocPath" value="C:/TEMP/GED/{CLIENT_GED}/{IDX1$'8'}/{IDX1}.PDF"/>
+		<!-- répertoire de dépose des index de GED -->
+		<!-- <property name="getIdxPath" value="C:/TEMP/GED/{CLIENT_GED}/{IDX1}.IDX"/> -->
+
+	</bean>
+
+
+	<!-- Fonction de traitement des flux batch. A ma connaissance : non utilisé-->
+	<bean id="batchConnector" class="com.bdoc.interfaces.webservice.batch.BatchConnector" init-method="initialize" >
+		<property name="batchConnection" ref="batchConnection"/>
+	</bean>
+
+	<bean id="batchConnection" class="com.bdoc.interfaces.webservice.batch.BatchConnectionFileSystem">
+		<property name="directory" value="C:/TEMP/SCAN"/>
+		<property name="filename" value="{NUMEDITION}"/>
+		<property name="extention" value=".IMM"/>
+	</bean>
+
+	  		
+  	<!-- Paramétrage des informations Bdoc-Web -->
+	<bean id="bdocWebProfile" class="com.bdoc.interfaces.webservice.parametres.BdocWebProfile" destroy-method="dispose" init-method="initvalues" > 
+		<property name="name" value="BdocWebVELA_5.0"/>
+		<property name="hostname" value="192.168.139.1"/>
+		<property name="port" value="800"/>
+		<property name="format" value="PDF"/>
+		<!-- fonction de recherche via mot clé ET/OU en Francais, AND/OR en anglais  -->
+		<property name="keyWordSerchOperator" value="ET"/>
+	</bean>
+	
+</beans>
+
+
