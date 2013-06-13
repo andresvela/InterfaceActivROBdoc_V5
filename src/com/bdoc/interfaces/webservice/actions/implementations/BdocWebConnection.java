@@ -1,6 +1,10 @@
 package com.bdoc.interfaces.webservice.actions.implementations;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.NoRouteToHostException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 
 import org.apache.log4j.Logger;
@@ -78,18 +82,12 @@ public class BdocWebConnection {
 	}
 
 	public JBApplication doConnect() throws BdocWebServiceInterfaceException {
-
+		
+		
+		 
+		
 		try {
-			ewConnect = new JBConnection(serveur,port);			
-			ewSession =  new JBApplication(ewConnect);
-			
-			if (ewConnect.isConnectedToBdocweb(true)) {
-				logger.info("connexion BdocWeb OK : ");
-				TableauDeBord.getInstance().addLog("Connexion à Bdoc-Web ["+serveur+":"+port+"] OK ");
-			} else {
-				TableauDeBord.getInstance().addLog("Erreur de Connexion à Bdoc-Web ["+serveur+":"+port+"] KO ");
-				throw new BDocWebException("Erreur de connexion cause inconnue. serveur= "+ serveur +", port="+port);
-			}
+			ewConnect = new JBConnection(serveur,port);					
 
 		} catch (BDocConnectionException e) {
 			String errorMessage = e.getMessage() + " - ";
@@ -109,17 +107,68 @@ public class BdocWebConnection {
 			}
 			logger.error(errorMessage);
 			throw new BdocWebServiceInterfaceException(6,errorMessage) ;
-		}  catch (IOException e) {
+		}  
+		
+		//test BdocWeb Network Errors. AVELA.
+		this.testSocket();
+		
+		
+		try {
+		ewSession =  new JBApplication(ewConnect);
+		}
+		
+		catch(BDocWebException e){
+			TableauDeBord.getInstance().addLog("Erreur de Connexion à Bdoc-Web ["+serveur+":"+port+"] KO ");
+			throw new BdocWebServiceInterfaceException(8, e) ;			
+		}
+		catch (BDocNetworkException e){			
 			logger.error("BDocNetworkException 		: "+e.getMessage());
 			throw new BdocWebServiceInterfaceException(4,e);
-		}
-
+		}		
+		
+		if (ewConnect.isConnectedToBdocweb(true)) {
+			logger.info("connexion BdocWeb OK : ");
+			TableauDeBord.getInstance().addLog("Connexion à Bdoc-Web ["+serveur+":"+port+"] OK ");
+		} 
 		return ewSession;
 	}
 
 	public boolean isConnected ()
 	{
 		return ewConnect.isConnectedToBdocweb();
+	}
+	
+	public void testSocket() throws BdocWebServiceInterfaceException{
+		try {
+			
+			   Socket s = null;
+	           s = new Socket(serveur, port);
+	        } catch (UnknownHostException e) {
+	        	// check spelling of hostname
+	        	String errorMessage = e.getMessage() + " - ";	        	
+	        	throw new BdocWebServiceInterfaceException(4,BdocWebServiceInterfaceException.getErrorLibelle(4) + " " + errorMessage + " - check spelling of hostname") ;
+	           
+	        } catch (ConnectException e) {
+	        	
+	        	// connection refused - is server down? Try another port.
+	        	String errorMessage = e.getMessage() + " - ";
+	        	throw new BdocWebServiceInterfaceException(4,BdocWebServiceInterfaceException.getErrorLibelle(4) + " " + errorMessage + " - connection refused - is server down? Try another port.") ;
+	        	
+	           
+	        } catch (NoRouteToHostException e) {
+	        	// The connect attempt timed out.  Try connecting through a proxy
+	        	String errorMessage = e.getMessage() + " - ";
+	        	throw new BdocWebServiceInterfaceException(4,BdocWebServiceInterfaceException.getErrorLibelle(4) + " " + errorMessage + " - The connect attempt timed out.  Try connecting through a proxy") ;
+	        	
+	           
+	        } catch (IOException e) {
+	        	// another error occurred
+	        	String errorMessage = e.getMessage() + " - ";
+	        	throw new BdocWebServiceInterfaceException(4,BdocWebServiceInterfaceException.getErrorLibelle(4) + " " + errorMessage + " - nother error occurred") ;
+	        	           
+	        }
+		
+		
 	}
 	
 	public synchronized JBApplication getJBApplication(String serveur, int port) throws BdocWebServiceInterfaceException  {

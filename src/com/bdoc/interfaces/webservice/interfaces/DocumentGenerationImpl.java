@@ -55,9 +55,11 @@ public class DocumentGenerationImpl implements DocumentGeneration {
 		try 
 		{
 			logger.debug("Start Parsing dataflow");
+			//TableauDeBord.getInstance().addLog("Start Parsing dataflow");			
 			ParserDataFlow parserDataFlow = new parseXMLdataflow();
 			docIndex = parserDataFlow.parseDataFlow(xmlFlow);
 			logger.debug("End Parsing dataflow");
+			//TableauDeBord.getInstance().addLog("End Parsing dataflow");	
 		} 
 		catch (BdocWebServiceInterfaceException e)
 		{
@@ -74,10 +76,13 @@ public class DocumentGenerationImpl implements DocumentGeneration {
 			for (IAction actiondef : actionList) {
 				IAction action = actiondef.getnewInstance();
 				logger.debug("Action : " + action.getClass().getName());
+				//TableauDeBord.getInstance().addLog("Action : " + action.getClass().getName());	
 				if (action.selectAction(docIndex)) {
 					logger.debug("Action founded : "+action.getClass().getName());
+					//TableauDeBord.getInstance().addLog("Action founded : "+action.getClass().getName());	
 					WebServiceRetour serviceRetour = action.execute(xmlFlow);
 					logger.debug("End action");
+					//TableauDeBord.getInstance().addLog("End action");	
 					TableauDeBord.getInstance().addOnefunction(action.getName(), Calendar.getInstance().getTimeInMillis() - start);
 					return serviceRetour;
 				}

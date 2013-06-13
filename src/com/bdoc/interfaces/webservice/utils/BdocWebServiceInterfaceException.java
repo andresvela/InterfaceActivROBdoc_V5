@@ -29,6 +29,7 @@ public class BdocWebServiceInterfaceException extends Exception {
 		errorCodes.put(7,   "Erreur aucune connexion à BdocWeb n'est paramétrée");
 		errorCodes.put(8,   "Erreur interne non documentée");
 		
+		
 		// Erreur des actions 100-199
 		errorCodes.put(100, "Erreur lors de la recherche d'indexes dans le flux xml");
 		errorCodes.put(101, "Erreur de l'action ToBdocEdit");
