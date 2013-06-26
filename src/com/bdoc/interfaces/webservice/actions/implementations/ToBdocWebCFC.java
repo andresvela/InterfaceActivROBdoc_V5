@@ -8,6 +8,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import javax.imageio.stream.FileImageInputStream;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import com.bdoc.interfaces.webservice.actions.Action;
 import com.bdoc.interfaces.webservice.actions.IAction;
@@ -21,7 +23,9 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.sun.org.apache.xerces.internal.parsers.XMLParser;
 import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
+import com.bdoc.specific.*;
 
 public class ToBdocWebCFC extends Action {
 	
@@ -131,13 +135,23 @@ public class ToBdocWebCFC extends Action {
 			byte[] indexcontent = null;				
 			byte[] b = null;
 			
-							
-			File F = new File(flowValue);
-			FileImageInputStream fis = new FileImageInputStream(F);
-			b = new byte[(int) F.length() ];
-			fis.read(b);
+					
+			//XMLLize file if templateName contains "_XML"
+			if (templateValue.contains("_XML")){
+				XmlizerFlatFile xmlCassiopeParser = new XmlizerFlatFile(flowValue);
+				xmlCassiopeParser.processLineByLine();
+				b = xmlCassiopeParser.writeXMLStream();				
+			}
 			
-			   
+			//Passes the flat file Non XMLized
+			else
+			{
+				File F = new File(flowValue);
+				FileImageInputStream fis = new FileImageInputStream(F);
+				b = new byte[(int) F.length() ];
+				fis.read(b);
+				
+			}
 			
 			if (templateFindCriteriaIndex==null)
 			{
@@ -214,6 +228,12 @@ public class ToBdocWebCFC extends Action {
 			BdocWebServiceInterfaceException ex = new BdocWebServiceInterfaceException(110,e);
 			logger.error(e.getMessage());
 			return new WebServiceRetour(ex);
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		} 
 		
 		return retour;
