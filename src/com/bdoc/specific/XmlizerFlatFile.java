@@ -30,22 +30,16 @@ public class XmlizerFlatFile {
 	protected Logger logger = Logger.getLogger(this.getClass());
 	private Scanner scanner;
 
-  public  void main(String... aArgs) throws FileNotFoundException, ParserConfigurationException, TransformerException {
-	XmlizerFlatFile parser = new XmlizerFlatFile("C:\\Temp\\Syn BN 01 (Amaral) Funding Notices_1.txt");
-    parser.processLineByLine();
-    writeXMLFile("C:\\Temp\\out.xml");
-    logger.debug("Xmlization Done.");
-  }
   
   /**
    Constructor.
    @param aFileName full name of an existing, readable file.
   */
   public XmlizerFlatFile(String aFileName){
-    fFile = new File(aFileName);     
+    this.fFile = new File(aFileName);     
     //Note that FileReader is used, not File, since File is not Closeable
     try {
-		Scanner scanner = new Scanner(new FileReader(fFile));
+		this.scanner = new Scanner(new FileReader(this.fFile));
 	} catch (FileNotFoundException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -65,8 +59,8 @@ public class XmlizerFlatFile {
     
 	 try {
 		 //first use a Scanner to get each line
-		 while ( scanner.hasNextLine() ){
-			 processLine( scanner.nextLine() );
+		 while ( this.scanner.hasNextLine() ){
+			 processLine( this.scanner.nextLine() );
 		 }     
     }
     catch (Exception e){    	
@@ -76,7 +70,7 @@ public class XmlizerFlatFile {
       //ensure the underlying stream is always closed
       //this only has any effect if the item passed to the Scanner
       //constructor implements Closeable (which it does in this case).
-      scanner.close();      
+      this.scanner.close();      
     }
   }
   
@@ -171,6 +165,8 @@ public class XmlizerFlatFile {
 		
 		DOMSource source = new DOMSource(doc);
 						
+		logger.debug("XML Transformation:" + doc.getXmlVersion());
+		
 		ByteArrayOutputStream out = new ByteArrayOutputStream();  
         StringWriter stringWriter = new StringWriter();  
         StreamResult result = new StreamResult(out); 

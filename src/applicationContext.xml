@@ -285,7 +285,7 @@
   	<!-- Paramétrage des informations Bdoc-Web -->
 	<bean id="bdocWebProfile" class="com.bdoc.interfaces.webservice.parametres.BdocWebProfile" destroy-method="dispose" init-method="initvalues" > 
 		<property name="name" value="BdocWebVELA_5.0"/>
-		<property name="hostname" value="port7-vela"/>
+		<property name="hostname" value="192.168.0.130"/>
 		<property name="port" value="800"/>
 		<property name="format" value="PDF"/>
 		<!-- fonction de recherche via mot clé ET/OU en Francais, AND/OR en anglais  -->
